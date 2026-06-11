@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int main(void)
+{
+    FILE *fp1, *fp2;
+    char file1[100], file2[100];
+    char buffer1[1000], buffer2[1000];
+
+    printf("첫번째 파일 이름: ");
+    scanf("%99s", file1);
+
+    printf("두번째 파일 이름: ");
+    scanf("%99s", file2);
+
+    // 첫번째 파일을 읽기 모드로 연다.
+    if ((fp1 = fopen(file1, "r")) == NULL)
+    {
+        fprintf(stderr, "첫번째 파일 %s을 열 수 없습니다.\n", file1);
+        exit(1);
+    }
+
+    // 두번째 파일을 읽기 모드로 연다.
+    if ((fp2 = fopen(file2, "r")) == NULL)
+    {
+        fprintf(stderr, "두번째 파일 %s을 열 수 없습니다.\n", file2);
+        fclose(fp1);
+        exit(1);
+    }
+
+    // 두 파일을 한 줄씩 비교한다.
+    while (1)
+    {
+        char *p1 = fgets(buffer1, sizeof(buffer1), fp1);
+        char *p2 = fgets(buffer2, sizeof(buffer2), fp2);
+
+        // 두 파일 모두 끝나면 종료
+        if (p1 == NULL && p2 == NULL)
+            break;
+
+        // 첫번째 파일만 끝난 경우: 두번째 파일에 남은 줄 출력
+        if (p1 == NULL)
+        {
+            printf(">> %s", buffer2);
+            continue;
+        }
+
+        // 두번째 파일만 끝난 경우: 첫번째 파일에 남은 줄 출력
+        if (p2 == NULL)
+        {
+            printf("<< %s", buffer1);
+            continue;
+        }
+
+        // 두 줄이 다르면 출력
+        if (strcmp(buffer1, buffer2) != 0)
+        {
+            printf("<< %s", buffer1);
+            printf(">> %s", buffer2);
+        }
+    }
+
+    fclose(fp1);
+    fclose(fp2);
+
+    return 0;
+}
